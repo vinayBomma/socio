@@ -17,6 +17,15 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
+          name="chat"
+          options={{
+            title: "Groups",
+            tabBarIcon: ({ color, focused }) => {
+              return <Feather name="users" size={24} color="black" />;
+            },
+          }}
+        />
+        <Tabs.Screen
           name="stats"
           options={{
             title: "Statistics",
@@ -25,21 +34,13 @@ const TabsLayout = () => {
             },
           }}
         />
-        <Tabs.Screen
-          name="chat"
-          options={{
-            title: "Chat",
-            tabBarIcon: ({ color, focused }) => {
-              return <Feather name="message-circle" size={24} color="black" />;
-            },
-          }}
-        />
+
         <Tabs.Screen
           name="profile"
           options={{
             title: "Profile",
             tabBarIcon: ({ color, focused }) => {
-              return <Feather name="user" size={24} color="black" />;
+              return <Feather name="settings" size={24} color="black" />;
             },
           }}
         />

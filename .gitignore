@@ -18,3 +18,8 @@ web-build/
 
 expo-env.d.ts
 # @end expo-cli
+
+android/
+lib/
+package-lock.json
+package-lock.json
