@@ -21,9 +21,8 @@ const GoogleAuth = () => {
         try {
           await GoogleSignin.hasPlayServices();
           const userInfo = await GoogleSignin.signIn();
-          console.log("userInfo", userInfo);
+          console.log("userInfo", JSON.stringify(userInfo));
           if (userInfo.idToken) {
-            console.log("userInfo.idToken", userInfo.idToken);
             const { data, error } = await supabase.auth.signInWithIdToken({
               provider: "google",
               token: userInfo.idToken,
