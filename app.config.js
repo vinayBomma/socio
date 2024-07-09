@@ -4,14 +4,25 @@ export default {
     slug: "social-habits",
     version: "1.0.0",
     orientation: "portrait",
+    icon: "./assets/icon.png",
     scheme: "social-habits",
     userInterfaceStyle: "automatic",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#000000",
+    },
     android: {
       package: "com.vinay.socialhabits",
+      adaptiveIcon: {
+        foregroundImage: "./assets/icon.png",
+        backgroundColor: "#000000",
+      },
     },
     web: {
       bundler: "metro",
       output: "static",
+      favicon: "./assets/favicon.png",
     },
     plugins: ["expo-router"],
     experiments: {

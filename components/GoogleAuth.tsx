@@ -5,7 +5,8 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { supabase } from "@/lib/supabase";
+import supabase from "../lib/supabase";
+import { router } from "expo-router";
 
 const GoogleAuth = () => {
   GoogleSignin.configure({
@@ -27,7 +28,10 @@ const GoogleAuth = () => {
               provider: "google",
               token: userInfo.idToken,
             });
-            console.log(error, data);
+            console.log(data);
+            if (data) {
+              router.push("/profile");
+            }
           } else {
             throw new Error("no ID token present!");
           }
