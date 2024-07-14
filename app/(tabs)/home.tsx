@@ -3,12 +3,12 @@ import React from "react";
 
 const Home = () => {
   return (
-    <View>
-      <Text>Home</Text>
+    <View className="flex-1 bg-white p-10">
+      <Text className="text-3xl font-bold my-5">sleep 8 hrs</Text>
+      // show react native calendar
+      <Text className="text-3xl font-bold my-5">meditate</Text>
     </View>
   );
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});

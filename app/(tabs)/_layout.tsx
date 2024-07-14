@@ -5,11 +5,16 @@ import { Feather } from "@expo/vector-icons";
 const TabsLayout = () => {
   return (
     <>
-      <Tabs screenOptions={{ tabBarShowLabel: false }}>
+      <Tabs
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarInactiveTintColor: "#ffffff",
+        }}
+      >
         <Tabs.Screen
           name="home"
           options={{
-            headerShown: true,
+            headerShown: false,
             title: "Home",
             tabBarIcon: ({ color, focused }) => {
               return <Feather name="home" size={24} color="black" />;
@@ -19,9 +24,9 @@ const TabsLayout = () => {
         <Tabs.Screen
           name="chat"
           options={{
-            title: "Groups",
+            title: "Chat",
             tabBarIcon: ({ color, focused }) => {
-              return <Feather name="users" size={24} color="black" />;
+              return <Feather name="message-circle" size={24} color="black" />;
             },
           }}
         />
@@ -40,7 +45,7 @@ const TabsLayout = () => {
           options={{
             title: "Profile",
             tabBarIcon: ({ color, focused }) => {
-              return <Feather name="settings" size={24} color="black" />;
+              return <Feather name="user" size={24} color="black" />;
             },
           }}
         />
