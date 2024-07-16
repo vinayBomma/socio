@@ -1,6 +1,7 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { View } from "react-native";
 
 const TabsLayout = () => {
   return (
@@ -8,7 +9,18 @@ const TabsLayout = () => {
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarInactiveTintColor: "#ffffff",
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 20,
+            left: 20,
+            right: 20,
+            elevation: 0,
+            backgroundColor: "black",
+            borderRadius: 15,
+            height: 60,
+            alignItems: "center",
+            justifyContent: "center",
+          },
         }}
       >
         <Tabs.Screen
@@ -16,8 +28,14 @@ const TabsLayout = () => {
           options={{
             headerShown: false,
             title: "Home",
-            tabBarIcon: ({ color, focused }) => {
-              return <Feather name="home" size={24} color="black" />;
+            tabBarIcon: ({ focused }) => {
+              return (
+                <Feather
+                  name="home"
+                  size={24}
+                  color={focused ? "white" : "grey"}
+                />
+              );
             },
           }}
         />
@@ -25,8 +43,37 @@ const TabsLayout = () => {
           name="chat"
           options={{
             title: "Chat",
-            tabBarIcon: ({ color, focused }) => {
-              return <Feather name="message-circle" size={24} color="black" />;
+            tabBarIcon: ({ focused }) => {
+              return (
+                <Feather
+                  name="message-circle"
+                  size={24}
+                  color={focused ? "white" : "grey"}
+                />
+              );
+            },
+          }}
+        />
+        <Tabs.Screen
+          name="add"
+          options={{
+            title: "Add",
+            tabBarIcon: () => {
+              return (
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 60,
+                    height: 60,
+                    backgroundColor: "teal",
+                    borderRadius: 30,
+                    marginBottom: 50,
+                  }}
+                >
+                  <Feather name="plus" size={24} color="white" />
+                </View>
+              );
             },
           }}
         />
@@ -34,8 +81,14 @@ const TabsLayout = () => {
           name="stats"
           options={{
             title: "Statistics",
-            tabBarIcon: ({ color, focused }) => {
-              return <Feather name="bar-chart-2" size={24} color="black" />;
+            tabBarIcon: ({ focused }) => {
+              return (
+                <Feather
+                  name="bar-chart-2"
+                  size={24}
+                  color={focused ? "white" : "grey"}
+                />
+              );
             },
           }}
         />
@@ -44,8 +97,14 @@ const TabsLayout = () => {
           name="profile"
           options={{
             title: "Profile",
-            tabBarIcon: ({ color, focused }) => {
-              return <Feather name="user" size={24} color="black" />;
+            tabBarIcon: ({ focused }) => {
+              return (
+                <Feather
+                  name="user"
+                  size={24}
+                  color={focused ? "white" : "grey"}
+                />
+              );
             },
           }}
         />
