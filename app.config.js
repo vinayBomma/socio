@@ -1,11 +1,11 @@
 export default {
   expo: {
-    name: "social-habits",
+    name: "Socio",
     slug: "social-habits",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
-    scheme: "social-habits",
+    scheme: "socio",
     userInterfaceStyle: "automatic",
     splash: {
       image: "./assets/splash.png",
