@@ -2,8 +2,9 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { router } from "expo-router";
 
-const Chat = () => {
+const Groups = () => {
   const [messages, setMessages]: any = useState([
     {
       id: 1,
@@ -32,7 +33,7 @@ const Chat = () => {
       <TouchableOpacity
         className="w-full flex-row items-center border-b border-b-gray-200"
         key={index}
-        onPress={() => console.log(item)}
+        onPress={() => router.push({ pathname: "/chat", params: item })}
       >
         <View>
           <Image
@@ -41,9 +42,11 @@ const Chat = () => {
             resizeMode="contain"
           />
         </View>
-        <View className="flex-row w-full mb-3">
+        <View className="flex-row w-full">
           <View className="flex-col">
-            <Text className="font-semibold text-sm ml-3">{item?.name}</Text>
+            <Text className="font-semibold text-sm ml-3 mb-2">
+              {item?.name}
+            </Text>
             <Text className="ml-3">{"Hey you there?"}</Text>
           </View>
           <View className="absolute right-16">
@@ -68,4 +71,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default Groups;

@@ -40,9 +40,10 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="chat"
+          name="groups"
           options={{
-            title: "Chat",
+            title: "Groups",
+            headerShown: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Feather
@@ -68,7 +69,7 @@ const TabsLayout = () => {
                     height: 60,
                     backgroundColor: "teal",
                     borderRadius: 30,
-                    marginBottom: 50,
+                    marginBottom: 60,
                   }}
                 >
                   <Feather name="plus" size={24} color="white" />
