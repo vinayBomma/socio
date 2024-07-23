@@ -9,6 +9,7 @@ const TabsLayout = () => {
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
+          headerShown: false,
           tabBarStyle: {
             position: "absolute",
             bottom: 20,
@@ -26,7 +27,6 @@ const TabsLayout = () => {
         <Tabs.Screen
           name="home"
           options={{
-            headerShown: false,
             title: "Home",
             tabBarIcon: ({ focused }) => {
               return (
@@ -43,7 +43,6 @@ const TabsLayout = () => {
           name="groups"
           options={{
             title: "Groups",
-            headerShown: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Feather
