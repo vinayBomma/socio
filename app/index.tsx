@@ -1,11 +1,12 @@
 import { Link, router } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import GoogleAuth from "@/components/GoogleAuth";
 import getGPTResponse from "@/lib/gpt.ts";
 import supabase from "@/lib/supabase.ts";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -45,22 +46,54 @@ export default function App() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-slate-400">
-      <Text className="text-3xl">Social Habits</Text>
-      <StatusBar style="auto" />
-      <GoogleAuth />
-      <TouchableOpacity
-        onPress={handleGuestLogin}
-        className="bg-blue-500 hover:bg-blue-700 py-1 px-2 rounded m-2"
-      >
-        <Text className="text-xl m-3 text-white">Continue as Guest</Text>
-      </TouchableOpacity>
-      <Link className="text-xl" href="/home">
-        Open Tabs
-      </Link>
-      <TouchableOpacity onPress={handleNotification}>
-        <Text className="text-xl m-3">Send Notifications</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="items-center justify-start p-2 h-3/5">
+        <View className="flex-row justify-around">
+          <Image
+            className="w-60 h-60"
+            source={require("./../assets/exercise.png")}
+            resizeMode="contain"
+          />
+          <Image
+            className="w-48 h-56"
+            source={require("./../assets/rockstar.png")}
+            resizeMode="contain"
+          />
+        </View>
+        <View className="flex-row justify-around">
+          <Image
+            className="w-60 h-60"
+            source={require("./../assets/meditation.png")}
+            resizeMode="contain"
+          />
+          <Image
+            className="w-48 h-56"
+            source={require("./../assets/read.png")}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+      <View className="bg-black flex-1 p-5 h-2/5">
+        <Text className="text-xl text-white text-center font-semibold">
+          Build Better Habits, Together.
+        </Text>
+        <View className="mt-5">
+          <GoogleAuth />
+          <TouchableOpacity
+            onPress={handleGuestLogin}
+            className="bg-white rounded m-2"
+          >
+            <Text className="text-lg m-3 text-center">Continue as Guest</Text>
+          </TouchableOpacity>
+        </View>
+        <View className="mt-3">
+          <Text className="text-md text-white text-center">
+            By proceeding further, you agree to our{" "}
+            <Link href="/home">Terms of Service</Link> and acknowledge our
+            Privacy Policy
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }

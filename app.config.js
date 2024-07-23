@@ -8,7 +8,7 @@ export default {
     scheme: "socio",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/splash.png",
+      image: "./assets/icon.png",
       resizeMode: "contain",
       backgroundColor: "#000000",
     },
