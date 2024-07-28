@@ -1,8 +1,35 @@
 import React, { useEffect } from "react";
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Stack, useNavigationContainerRef } from "expo-router";
 import { useFonts } from "expo-font";
+import * as Sentry from "@sentry/react-native";
+import Constants from "expo-constants";
+import { isRunningInExpoGo } from "expo";
+
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+  dsn: Constants.expoConfig?.extra?.envKeys.SENTRY_DSN,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+      enableNativeFramesTracking: !isRunningInExpoGo(),
+    }),
+  ],
+  _experiments: {
+    replaysSessionSampleRate: 1.0,
+    replaysOnErrorSampleRate: 1.0,
+  },
+});
 
 const RootLayout = () => {
+  const ref = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
+
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -33,4 +60,4 @@ const RootLayout = () => {
   );
 };
 
-export default RootLayout;
+export default Sentry.wrap(RootLayout);
