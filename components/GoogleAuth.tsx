@@ -26,7 +26,7 @@ const GoogleAuth = () => {
         });
         console.log(data);
         if (data) {
-          router.push("/profile");
+          router.push("/home");
         }
       } else {
         throw new Error("no ID token present!");
@@ -47,7 +47,7 @@ const GoogleAuth = () => {
   return (
     <TouchableOpacity
       onPress={handleGoogleSignin}
-      className="flex-row bg-slate-100 rounded m-2 justify-center items-center"
+      className="flex-row bg-white rounded m-2 justify-center items-center"
     >
       <Image className="w-6 h-6" source={require("./../assets/google.png")} />
       <Text className="text-lg m-3 text-center">Continue with Google</Text>
