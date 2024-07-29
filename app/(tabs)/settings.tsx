@@ -1,5 +1,5 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import supabase from "@/lib/supabase";
@@ -28,6 +28,15 @@ const createSessionFromUrl = async (url: string) => {
 };
 
 const Settings = () => {
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (!data?.session) {
+        router.push("/");
+      }
+    };
+    fetchUser();
+  });
   const url = Linking.useURL();
   console.log("url", url);
   if (url) createSessionFromUrl(url);

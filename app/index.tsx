@@ -17,6 +17,15 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session) {
+        router.push("/home");
+      }
+    };
+    fetchUser();
+  });
   useEffect(() => {});
   const handleGuestLogin = async () => {
     const { data, error } = await supabase.auth.signInAnonymously();
@@ -40,6 +49,8 @@ export default function App() {
       content: {
         title: "You've got mail! 📬",
         body: data,
+        vibrate: [200, 100, 200, 100, 200, 100, 200],
+        sound: "notification.wav",
       },
       trigger: null,
     });

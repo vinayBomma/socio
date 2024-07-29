@@ -1,10 +1,20 @@
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
+import supabase from "@/lib/supabase";
 
 const Groups = () => {
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (!data?.session) {
+        router.push("/");
+      }
+    };
+    fetchUser();
+  });
   const [messages, setMessages]: any = useState([
     {
       id: 1,
@@ -59,7 +69,10 @@ const Groups = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar style="auto" />
-      <View className="flex-1 p-5 bg-white">
+      <View>
+        <Text className="text-2xl font-pblack p-5 text-center">GROUPS</Text>
+      </View>
+      <View className="flex-1 px-5 bg-white">
         <FlatList
           data={messages}
           showsVerticalScrollIndicator={false}
