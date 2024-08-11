@@ -1,16 +1,17 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 
 const TabsLayout = () => {
   return (
     <>
       <Tabs
-        screenOptions={{
+        screenOptions={({ route }) => ({
           tabBarShowLabel: false,
           headerShown: false,
           tabBarStyle: {
+            display: route.name === "create" ? "none" : "flex",
             position: "absolute",
             bottom: 20,
             left: 20,
@@ -22,7 +23,7 @@ const TabsLayout = () => {
             alignItems: "center",
             justifyContent: "center",
           },
-        }}
+        })}
       >
         <Tabs.Screen
           name="home"
@@ -30,9 +31,9 @@ const TabsLayout = () => {
             title: "Home",
             tabBarIcon: ({ focused }) => {
               return (
-                <Feather
-                  name="home"
-                  size={24}
+                <Ionicons
+                  name="today-sharp"
+                  size={28}
                   color={focused ? "white" : "grey"}
                 />
               );
@@ -40,24 +41,25 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="groups"
+          name="digest"
           options={{
-            title: "Groups",
+            title: "Digest",
             tabBarIcon: ({ focused }) => {
               return (
-                <Feather
-                  name="message-circle"
-                  size={24}
+                <Ionicons
+                  name="sparkles-sharp"
+                  size={28}
                   color={focused ? "white" : "grey"}
                 />
               );
             },
           }}
         />
+
         <Tabs.Screen
-          name="add"
+          name="create"
           options={{
-            title: "Add",
+            title: "Create",
             tabBarIcon: () => {
               return (
                 <View
@@ -71,21 +73,21 @@ const TabsLayout = () => {
                     marginBottom: 60,
                   }}
                 >
-                  <Feather name="plus" size={24} color="white" />
+                  <Ionicons name="add-sharp" size={28} color="white" />
                 </View>
               );
             },
           }}
         />
         <Tabs.Screen
-          name="stats"
+          name="groups"
           options={{
-            title: "Statistics",
+            title: "Groups",
             tabBarIcon: ({ focused }) => {
               return (
-                <Feather
-                  name="bar-chart-2"
-                  size={24}
+                <Ionicons
+                  name="people-sharp"
+                  size={28}
                   color={focused ? "white" : "grey"}
                 />
               );
@@ -94,14 +96,14 @@ const TabsLayout = () => {
         />
 
         <Tabs.Screen
-          name="profile"
+          name="settings"
           options={{
-            title: "Profile",
+            title: "Settings",
             tabBarIcon: ({ focused }) => {
               return (
-                <Feather
-                  name="user"
-                  size={24}
+                <Ionicons
+                  name="settings-sharp"
+                  size={28}
                   color={focused ? "white" : "grey"}
                 />
               );
