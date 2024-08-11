@@ -54,6 +54,7 @@ export default {
     extra: {
       envKeys: {
         OPEN_AI_KEY: process.env.OPEN_AI_KEY,
+        GEMINI_KEY: process.env.GEMINI_KEY,
         SUPABASE_URL: process.env.SUPABASE_URL,
         SUPABASE_KEY: process.env.SUPABASE_KEY,
         SENTRY_DSN: process.env.SENTRY_DSN,
