@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import supabase from "@/lib/supabase";
+import { Feather } from "@expo/vector-icons";
 
 const Groups = () => {
   useEffect(() => {
@@ -69,17 +70,37 @@ const Groups = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar style="auto" />
-      <View>
-        <Text className="text-2xl font-pblack p-5 text-center">GROUPS</Text>
+      <View className="flex-row justify-between">
+        <View className="w-3/12"></View>
+        <View className="w-6/12 items-center">
+          <Text className="text-2xl font-pblack p-5 text-center">GROUPS</Text>
+        </View>
+        <TouchableOpacity
+          className="w-3/12 flex-row items-center ml-3"
+          onPress={() => router.push("/join_group")}
+        >
+          <Feather name="user-plus" size={24} color="black" />
+          <Text className="text-base p-2 uppercase font-psemibold">Join</Text>
+        </TouchableOpacity>
       </View>
-      <View className="flex-1 px-5 bg-white">
-        <FlatList
-          data={messages}
-          showsVerticalScrollIndicator={false}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
+      {messages?.length > 0 ? (
+        <View className="flex-1 px-5 bg-white">
+          <FlatList
+            data={messages}
+            showsVerticalScrollIndicator={false}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+      ) : (
+        <View className="items-center justify-center">
+          <Feather name="info" size={32} color="black" />
+          <Text className="text-lg font-psemibold p-5 text-center">
+            No groups found. Start tracking your habits with others by creating
+            or joining a group today!
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
