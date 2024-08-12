@@ -16,25 +16,57 @@ const Digest = () => {
       }
 
       const geminiData: any = await getGeminiResponse(
-        "User has consistently being exercising since 5 days. Give a short funny and quirky response. Be positive"
+        "User has checked don't drink alcohol for 3 days."
       );
       setGeminiData(geminiData);
     };
     fetchUser();
   }, []);
+
   return (
     <SafeAreaView className="flex-1 bg-white pb-28">
       <ScrollView>
         <View>
-          <Text className="text-2xl font-pblack p-5 text-center">
-            AI DIGEST
+          <Text className="text-2xl font-pblack p-5 text-center uppercase">
+            AI Digest
           </Text>
         </View>
         <View className="flex-1 items-center justify-center p-3">
           {geminiData ? (
-            <Text className="text-lg font-psemibold p-5 text-center">
-              {geminiData}
-            </Text>
+            <>
+              <View className="border-b border-gray-300">
+                <Text className="text-xl font-pbold p-3 text-center">
+                  Exercise
+                </Text>
+                <Text className="text-lg font-psemibold text-center px-3">
+                  {geminiData}
+                </Text>
+              </View>
+              <View className="border-b border-gray-300">
+                <Text className="text-xl font-pbold p-3 text-center">
+                  Reading
+                </Text>
+                <Text className="text-lg font-psemibold text-center px-3">
+                  {geminiData}
+                </Text>
+              </View>
+              <View className="border-b border-gray-300">
+                <Text className="text-xl font-pbold p-3 text-center">
+                  Knitting
+                </Text>
+                <Text className="text-lg font-psemibold text-center px-3">
+                  {geminiData}
+                </Text>
+              </View>
+              <View className="border-b border-gray-300">
+                <Text className="text-xl font-pbold p-3 text-center">
+                  Sleep
+                </Text>
+                <Text className="text-lg font-psemibold text-center px-3">
+                  {geminiData}
+                </Text>
+              </View>
+            </>
           ) : (
             <>
               <Feather name="info" size={32} color="black" />
