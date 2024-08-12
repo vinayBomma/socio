@@ -7,6 +7,8 @@ import supabase from "@/lib/supabase.ts";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import getGeminiResponse from "@/lib/gemini";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -41,8 +43,11 @@ export default function App() {
   };
 
   async function schedulePushNotification() {
-    const data = await getGPTResponse(
-      "User has consistently being exercising since 5 days"
+    // const data = await getGPTResponse(
+    //   "User has consistently being exercising since 5 days"
+    // );
+    const data = await getGeminiResponse(
+      "User has consistently being exercising since 5 days. Give a short funny and quirky response. Be positive"
     );
     console.log("data", data);
     await Notifications.scheduleNotificationAsync({
@@ -92,8 +97,9 @@ export default function App() {
           <GoogleAuth />
           <TouchableOpacity
             onPress={handleGuestLogin}
-            className="bg-white rounded m-2"
+            className="bg-white rounded m-2 flex-row items-center justify-center"
           >
+            <MaterialCommunityIcons name="incognito" size={24} color="black" />
             <Text className="text-lg m-3 text-center">Continue as Guest</Text>
           </TouchableOpacity>
         </View>
