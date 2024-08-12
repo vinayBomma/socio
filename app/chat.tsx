@@ -12,15 +12,39 @@ const Chat = () => {
   const renderMessage = (props: any) => {
     const { currentMessage } = props;
     if (currentMessage?.user?._id === 2) {
+      const currentTime = new Date(
+        currentMessage?.createdAt
+      ).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
       return (
-        <View className="flex-row flex-1 justify-end">
-          <Bubble
-            {...props}
-            wrapperStyle={{
-              right: { backgroundColor: "#93c5fd", marginRight: 10 },
-            }}
-            textStyle={{ right: { color: "#000" } }}
-          />
+        <View className="px-3 py-1 items-end">
+          <View className="bg-black p-5 rounded-xl">
+            <Text className="text-white font-pmedium text-base">
+              {currentMessage?.text}
+            </Text>
+            <Text className="text-white font-plight">{currentTime}</Text>
+          </View>
+        </View>
+      );
+    } else {
+      const currentTime = new Date(
+        currentMessage?.createdAt
+      ).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+      return (
+        <View className="px-3 py-1 items-start">
+          <View className="bg-gray-200 p-5 rounded-xl">
+            <Text className="text-black font-pmedium text-base">
+              {currentMessage?.text}
+            </Text>
+            <Text className="text-black font-plight">{currentTime}</Text>
+          </View>
         </View>
       );
     }
@@ -29,6 +53,31 @@ const Chat = () => {
   const handleInputText = (text: string) => {
     setInputMessage(text);
   };
+
+  useEffect(() => {
+    setMessages([
+      {
+        _id: 1,
+        text: "User has checked don't watch TV since 48 days. Give a short and humourous response. You can use a pop culture reference",
+        createdAt: new Date(),
+        user: {
+          _id: 1,
+          name: "React Native",
+          avatar: "https://placeimg.com/140/140/any",
+        },
+      },
+      {
+        _id: 2,
+        text: "Hi there!",
+        createdAt: new Date(),
+        user: {
+          _id: 1,
+          name: "React Native",
+          avatar: "https://placeimg.com/140/140/any",
+        },
+      },
+    ]);
+  }, []);
 
   const handleSubmit = () => {
     const newMessage = {
@@ -47,7 +96,7 @@ const Chat = () => {
     );
     setInputMessage("");
 
-    console.log("newMessage", messages);
+    // console.log("newMessage", messages);
   };
 
   const data: any = useLocalSearchParams();
@@ -55,10 +104,12 @@ const Chat = () => {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row justify-between p-3 border-b border-b-gray-200">
         <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="black" />
-          </TouchableOpacity>
-          <View className="flex-row items-center w-full">
+          <View className="w-1/12">
+            <TouchableOpacity onPress={() => router.back()}>
+              <Feather name="arrow-left" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View className="flex-row items-center w-10/12">
             <Image
               className="h-12 w-12 rounded-full ml-3"
               source={{ uri: data?.avatar }}
@@ -66,13 +117,18 @@ const Chat = () => {
             />
             <Text className="ml-5 font-semibold text-lg">{data?.name}</Text>
           </View>
+          <View className="w-1/12">
+            <TouchableOpacity onPress={() => router.push("/group_info")}>
+              <Feather name="info" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
       <GiftedChat
         messages={messages || []}
         user={{
-          _id: 1,
+          _id: 2,
         }}
         renderInputToolbar={() => null}
         minInputToolbarHeight={0}
@@ -90,7 +146,7 @@ const Chat = () => {
           />
         </View>
         <TouchableOpacity
-          className="rounded-full bg-teal-700 p-2 mr-3"
+          className="rounded-full bg-black p-3  mr-3"
           onPress={handleSubmit}
         >
           <Ionicons name="send" size={24} color="white" />
