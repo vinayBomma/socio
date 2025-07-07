@@ -6,8 +6,11 @@ import {
 } from "@react-native-google-signin/google-signin";
 import supabase from "../lib/supabase";
 import { router } from "expo-router";
+import { useAppDispatch } from "../store/hooks";
+import { loginStart, loginSuccess, loginFailure } from "../store/authSlice";
 
 const GoogleAuth = () => {
+  const dispatch = useAppDispatch();
   GoogleSignin.configure({
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     webClientId:
@@ -15,6 +18,7 @@ const GoogleAuth = () => {
   });
 
   const handleGoogleSignin = async () => {
+    dispatch(loginStart());
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -25,13 +29,24 @@ const GoogleAuth = () => {
           token: userInfo.idToken,
         });
         console.log(data);
-        if (data) {
+        if (data && userInfo.user) {
+          dispatch(
+            loginSuccess({
+              id: userInfo.user.id,
+              name: userInfo.user.name || "",
+              email: userInfo.user.email || "",
+              avatarUrl: userInfo.user.photo || undefined,
+            })
+          );
           router.push("/home");
+        } else if (error) {
+          dispatch(loginFailure(error.message));
         }
       } else {
         throw new Error("no ID token present!");
       }
     } catch (error: any) {
+      dispatch(loginFailure(error.message || "Google sign-in failed"));
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {

@@ -4,6 +4,9 @@ import { useFonts } from "expo-font";
 import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { isRunningInExpoGo } from "expo";
+import { Provider } from "react-redux";
+
+import { store } from "../store";
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -54,9 +57,11 @@ const RootLayout = () => {
     return null;
   }
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-    </Stack>
+    <Provider store={store}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+      </Stack>
+    </Provider>
   );
 };
 
