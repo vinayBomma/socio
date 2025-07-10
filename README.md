@@ -1,4 +1,8 @@
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Socio – Social Habit Tracker
+
+**Socio** is a social habit tracking app that helps you build better habits through accountability. Create groups, chat with friends and family and make better habits with AI insights.
+
+![App Icon](https://i.ibb.co/wN6R57kX/icon.png)
 
 ## Get started
 
