@@ -6,6 +6,8 @@ import { router, useFocusEffect } from "expo-router";
 import supabase from "@/lib/supabase";
 import { Feather } from "@expo/vector-icons";
 
+const PLACEHOLDER_AVATAR = "https://cataas.com/cat";
+
 const Groups = () => {
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +18,31 @@ const Groups = () => {
       router.push("/");
       return;
     }
+    const userId = data.session.user.id;
+    const { data: memberships, error: memberError } = await supabase
+      .from("group_members")
+      .select("group_id")
+      .eq("user_id", userId);
+
+    if (memberError) {
+      console.error("Error fetching memberships:", memberError.message);
+      setGroups([]);
+      setLoading(false);
+      return;
+    }
+
+    const groupIds = memberships?.map((m) => m.group_id) || [];
+    if (groupIds.length === 0) {
+      setGroups([]);
+      setLoading(false);
+      return;
+    }
+
     const { data: groupsData, error: groupsError } = await supabase
       .from("groups")
-      .select("*");
+      .select("*")
+      .in("id", groupIds);
+
     if (groupsError) {
       console.error("Error fetching groups:", groupsError.message);
       setGroups([]);
@@ -39,6 +63,7 @@ const Groups = () => {
   );
 
   const renderItem = ({ item, index }: any) => {
+    const avatarUri = item?.avatar && item.avatar.trim() !== "" ? item.avatar : PLACEHOLDER_AVATAR;
     return (
       <TouchableOpacity
         className="w-full flex-row items-center border-b border-b-gray-200"
@@ -48,8 +73,8 @@ const Groups = () => {
         <View>
           <Image
             className="w-16 h-16 rounded-full my-3"
-            source={{ uri: item?.avatar }}
-            resizeMode="contain"
+            source={{ uri: avatarUri }}
+            resizeMode="cover"
           />
         </View>
         <View className="flex-row w-full">
@@ -87,7 +112,14 @@ const Groups = () => {
         <View className="items-center justify-center flex-1">
           <Text>Loading...</Text>
         </View>
-      ) : groups?.length > 0 ? (
+      ) : groups?.length === 0 ? (
+        <View className="items-center justify-center mx-3 py-5 bg-black rounded-xl">
+          <Feather name="info" size={32} color="white" />
+          <Text className="text-lg font-psemibold text-white text-center px-5 mt-3">
+            You haven't joined or created any groups yet. Connect with others and stay motivated by joining or starting a group.
+          </Text>
+        </View>
+      ) : (
         <View className="flex-1 px-5 bg-white">
           <FlatList
             data={groups}
@@ -95,14 +127,6 @@ const Groups = () => {
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
           />
-        </View>
-      ) : (
-        <View className="items-center justify-center">
-          <Feather name="info" size={32} color="black" />
-          <Text className="text-lg font-psemibold p-5 text-center">
-            No groups found. Start tracking your habits with others by creating
-            or joining a group today!
-          </Text>
         </View>
       )}
     </SafeAreaView>
