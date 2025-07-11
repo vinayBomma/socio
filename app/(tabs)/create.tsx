@@ -30,6 +30,10 @@ const Create = () => {
     reminderTime: new Date(),
     reminderNote: "",
   });
+  const [groupForm, setGroupForm] = useState({
+    name: "",
+    description: "",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -87,9 +91,9 @@ const Create = () => {
       .from("groups")
       .insert({
         created_at: new Date(),
-        name: "Some Group",
+        name: groupForm.name,
         group_code: groupCode,
-        description: "some description",
+        description: groupForm.description,
       })
       .select();
 
@@ -263,10 +267,14 @@ const Create = () => {
                 <TextInput
                   className="w-full text-lg border-2 border-black p-3 rounded-xl"
                   placeholder="Group Name"
+                  value={groupForm.name}
+                  onChangeText={(value) => setGroupForm({ ...groupForm, name: value })}
                 />
                 <TextInput
                   className="w-full text-lg border-2 border-black p-3 rounded-xl mt-5"
                   placeholder="Description"
+                  value={groupForm.description}
+                  onChangeText={(value) => setGroupForm({ ...groupForm, description: value })}
                 />
                 <View className="w-full flex-row flex-wrap">
                   <TextInput

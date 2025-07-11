@@ -2,49 +2,48 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import supabase from "@/lib/supabase";
 import { Feather } from "@expo/vector-icons";
 
 const Groups = () => {
+  const [groups, setGroups] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchGroups = async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (!data?.session) {
+      router.push("/");
+      return;
+    }
+    const { data: groupsData, error: groupsError } = await supabase
+      .from("groups")
+      .select("*");
+    if (groupsError) {
+      console.error("Error fetching groups:", groupsError.message);
+      setGroups([]);
+    } else {
+      setGroups(groupsData || []);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (!data?.session) {
-        router.push("/");
-      }
-    };
-    fetchUser();
-  });
-  const [messages, setMessages]: any = useState([
-    {
-      id: 1,
-      name: "React Native",
-      avatar: "https://loremflickr.com/500/500",
-    },
-    {
-      id: 2,
-      name: "Jest",
-      avatar: "https://loremflickr.com/500/500",
-    },
-    {
-      id: 3,
-      name: "Expo",
-      avatar: "https://loremflickr.com/500/500",
-    },
-    {
-      id: 4,
-      name: "Jest",
-      avatar: "https://loremflickr.com/500/500",
-    },
-  ]);
+    fetchGroups();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchGroups();
+    }, [])
+  );
 
   const renderItem = ({ item, index }: any) => {
     return (
       <TouchableOpacity
         className="w-full flex-row items-center border-b border-b-gray-200"
         key={index}
-        onPress={() => router.push({ pathname: "/chat", params: item })}
+        onPress={() => router.replace({ pathname: "/chat", params: item })}
       >
         <View>
           <Image
@@ -67,6 +66,7 @@ const Groups = () => {
       </TouchableOpacity>
     );
   };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar style="auto" />
@@ -77,19 +77,23 @@ const Groups = () => {
         </View>
         <TouchableOpacity
           className="w-3/12 flex-row items-center ml-3"
-          onPress={() => router.push("/join_group")}
+          onPress={() => router.push("/join_group" as any)}
         >
           <Feather name="user-plus" size={24} color="black" />
           <Text className="text-base p-2 uppercase font-psemibold">Join</Text>
         </TouchableOpacity>
       </View>
-      {messages?.length > 0 ? (
+      {loading ? (
+        <View className="items-center justify-center flex-1">
+          <Text>Loading...</Text>
+        </View>
+      ) : groups?.length > 0 ? (
         <View className="flex-1 px-5 bg-white">
           <FlatList
-            data={messages}
+            data={groups}
             showsVerticalScrollIndicator={false}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id.toString()}
           />
         </View>
       ) : (
