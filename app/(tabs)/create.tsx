@@ -82,11 +82,24 @@ const Create = () => {
       })
       .select();
 
+    setHabitForm({
+      name: "",
+      description: "",
+      frequency_count: "",
+      frequency_period: "",
+      isReminder: false,
+      reminderTime: new Date(),
+      reminderNote: "",
+    });
     router.push("/home");
     console.log(data, error);
   };
 
   const handleCreateGroup = async () => {
+    if (!groupCode) {
+      alert("Please generate a group code before creating a group.");
+      return;
+    }
     const { data, error } = await supabase
       .from("groups")
       .insert({
@@ -97,6 +110,16 @@ const Create = () => {
       })
       .select();
 
+    if (data && data[0] && userUUID) {
+      await supabase.from("group_members").insert({
+        group_id: data[0].id,
+        user_id: userUUID,
+      });
+    }
+
+    setGroupForm({ name: "", description: "" });
+    setGroupCode("");
+    router.push("/groups");
     console.log(data, error);
   };
 
