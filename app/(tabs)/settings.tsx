@@ -7,6 +7,8 @@ import { router } from "expo-router";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
+import { useAppSelector } from "@/store/hooks";
+import { useSupabaseUser } from "@/lib/user";
 
 const redirectTo = makeRedirectUri();
 
@@ -28,6 +30,9 @@ const createSessionFromUrl = async (url: string) => {
 };
 
 const Settings = () => {
+  useSupabaseUser();
+  const user = useAppSelector((state) => state.auth.user);
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -45,17 +50,6 @@ const Settings = () => {
     if (!error) router.push("/");
   };
 
-  const linkGoogleAccount = async () => {
-    const { data, error } = await supabase.auth.linkIdentity({
-      provider: "google",
-      options: { redirectTo: redirectTo },
-    });
-    if (data?.url) {
-      router.navigate(data?.url);
-    }
-    console.log("data", data);
-    console.log("error", error);
-  };
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View>
@@ -64,19 +58,15 @@ const Settings = () => {
       <View className="items-center border-b border-b-gray-200 p-2">
         <Image
           className="w-16 h-16 rounded-full my-3"
-          source={{ uri: "https://loremflickr.com/500/500" }}
+          source={{
+            uri:
+              user?.user_metadata?.avatar_url ||
+              "https://loremflickr.com/500/500",
+          }}
         />
-        <Text className="font-bold text-lg">Guest</Text>
-        <TouchableOpacity
-          className="flex-row px-3 bg-black rounded items-center m-2"
-          onPress={linkGoogleAccount}
-        >
-          <Image
-            className="w-6 h-6"
-            source={require("../../assets/google.png")}
-          />
-          <Text className="text-lg text-white p-3">Link Google Account</Text>
-        </TouchableOpacity>
+        <Text className="font-bold text-lg">
+          {user?.user_metadata?.name || "Guest"}
+        </Text>
       </View>
       <View className="p-3">
         <TouchableOpacity className="flex-row items-center p-2">
