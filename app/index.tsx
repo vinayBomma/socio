@@ -106,7 +106,7 @@ export default function App() {
         <View className="mt-3">
           <Text className="text-md text-white text-center">
             By proceeding further, you agree to our{" "}
-            <Link href="/home">Terms of Service</Link> and acknowledge our
+            Terms of Service and acknowledge our
             Privacy Policy
           </Text>
         </View>

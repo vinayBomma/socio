@@ -68,13 +68,13 @@ const Digest = () => {
               </View>
             </>
           ) : (
-            <>
-              <Feather name="info" size={32} color="black" />
-              <Text className="text-lg font-psemibold p-5 text-center">
-                No data is currently available. As you continue tracking your
-                habits, your AI insights will soon be displayed here.
+            <View className="flex-1 items-center justify-center mx-3 py-5 bg-black rounded-xl">
+              <Feather name="info" size={32} color="white" />
+              <Text className="text-lg font-psemibold text-white text-center px-5 mt-3">
+                AI insights will soon appear here as you continue tracking your habits
+                and progress.
               </Text>
-            </>
+            </View>
           )}
         </View>
       </ScrollView>
