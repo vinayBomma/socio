@@ -2,11 +2,16 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { CalendarProvider, WeekCalendar } from "react-native-calendars";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import supabase from "@/lib/supabase";
+import { useAppSelector } from "@/store/hooks";
+import { useSupabaseUser } from "@/lib/user";
 
 const Home = () => {
+  useSupabaseUser();
+  const user = useAppSelector((state) => state.auth.user);
+
   type Habit = {
     id: string;
     name: string;
@@ -14,32 +19,24 @@ const Home = () => {
     [key: string]: any;
   };
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [completions, setCompletions] = useState<{ [habitId: string]: { [date: string]: boolean } }>({}); // { habitId: { 'YYYY-MM-DD': true } }
-  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [completions, setCompletions] = useState<{
+    [habitId: string]: { [date: string]: boolean };
+  }>({}); // { habitId: { 'YYYY-MM-DD': true } }
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data?.session) {
-        router.push("/");
-      } else {
-        setUserId(data.session.user.id);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (!userId) return;
+    if (!user?.id) return;
     const fetchHabits = async () => {
-      const { data } = await supabase.from("habits").select("*").eq("uuid", userId);
+      const { data } = await supabase
+        .from("habits")
+        .select("*")
+        .eq("uuid", user.id);
       setHabits(data || []);
     };
     fetchHabits();
-  }, [userId]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (!userId || habits.length === 0) return;
+    if (!user?.id || habits.length === 0) return;
     const fetchCompletions = async () => {
       const today = new Date();
       const start = new Date(today);
@@ -51,7 +48,7 @@ const Home = () => {
       const { data } = await supabase
         .from("habit_completions")
         .select("habit_id,date")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .gte("date", startStr)
         .lte("date", endStr);
       const map: { [habitId: string]: { [date: string]: boolean } } = {};
@@ -62,10 +59,10 @@ const Home = () => {
       setCompletions(map);
     };
     fetchCompletions();
-  }, [userId, habits]);
+  }, [user?.id, habits]);
 
   const toggleCompletion = async (habitId: string, dateStr: string) => {
-    if (!userId) {
+    if (!user?.id) {
       console.error("No userId found");
       return;
     }
@@ -75,7 +72,7 @@ const Home = () => {
           .from("habit_completions")
           .delete()
           .eq("habit_id", habitId)
-          .eq("user_id", userId)
+          .eq("user_id", user.id)
           .eq("date", dateStr);
         if (error) {
           console.error("Delete error:", error.message);
@@ -85,7 +82,7 @@ const Home = () => {
       } else {
         const { error } = await supabase.from("habit_completions").insert({
           habit_id: habitId,
-          user_id: userId,
+          user_id: user.id,
           date: dateStr,
         });
         if (error) {
@@ -108,7 +105,7 @@ const Home = () => {
     const { data, error } = await supabase
       .from("habit_completions")
       .select("habit_id,date")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .gte("date", startStr)
       .lte("date", endStr);
     if (error) {
@@ -147,50 +144,83 @@ const Home = () => {
               <WeekCalendar firstDay={1} />
             </CalendarProvider>
           </View>
-          {habits.map((habit) => {
-            const weekDates = getWeekDates();
-            const markedDates: { [date: string]: { selected: boolean; color: string; textColor: string } } = {};
-            weekDates.forEach((date) => {
-              if (completions[habit.id]?.[date]) {
-                markedDates[date] = {
-                  selected: true,
-                  color: "black",
-                  textColor: "white",
+          {habits.length === 0 ? (
+            <View className="flex-1 items-center justify-center mx-3 py-5 bg-black rounded-xl">
+              <Feather name="info" size={32} color="white" />
+              <Text className="text-lg font-psemibold text-white text-center px-5 mt-3">
+                You haven't added any habits yet. Start building positive
+                routines by creating your first habit.
+              </Text>
+            </View>
+          ) : (
+            habits.map((habit) => {
+              const weekDates = getWeekDates();
+              const markedDates: {
+                [date: string]: {
+                  selected: boolean;
+                  color: string;
+                  textColor: string;
                 };
-              }
-            });
-            const todayStr = new Date().toISOString().split("T")[0];
-            return (
-              <View key={habit.id} className="rounded-xl m-1 px-3">
-                <View className="flex-row justify-between items-center">
-                  <Text className="text-2xl font-psemibold ml-2">{habit.name}</Text>
-                  <TouchableOpacity
-                    onPress={() => toggleCompletion(habit.id, todayStr)}
-                    className="mr-2"
-                  >
-                    <Ionicons
-                      name={completions[habit.id]?.[todayStr] ? "checkmark-circle" : "ellipse-outline"}
-                      size={32}
-                      color={completions[habit.id]?.[todayStr] ? "black" : "gray"}
-                    />
-                  </TouchableOpacity>
+              } = {};
+              weekDates.forEach((date) => {
+                if (completions[habit.id]?.[date]) {
+                  markedDates[date] = {
+                    selected: true,
+                    color: "black",
+                    textColor: "white",
+                  };
+                }
+              });
+              const todayStr = new Date().toISOString().split("T")[0];
+              return (
+                <View key={habit.id} className="rounded-xl m-1 px-3">
+                  <View className="flex-row justify-between items-center">
+                    <TouchableOpacity
+                      onPress={() =>
+                        router.push({
+                          pathname: "/edit",
+                          params: { id: habit.id },
+                        })
+                      }
+                    >
+                      <Text className="text-2xl font-psemibold ml-2">
+                        {habit.name}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => toggleCompletion(habit.id, todayStr)}
+                      className="mr-2"
+                    >
+                      <Ionicons
+                        name={
+                          completions[habit.id]?.[todayStr]
+                            ? "checkmark-circle"
+                            : "ellipse-outline"
+                        }
+                        size={32}
+                        color={
+                          completions[habit.id]?.[todayStr] ? "black" : "gray"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View className="h-20 w-full mt-1">
+                    <CalendarProvider date={todayStr}>
+                      <WeekCalendar
+                        firstDay={1}
+                        allowShadow={false}
+                        hideDayNames={true}
+                        pastScrollRange={0}
+                        futureScrollRange={0}
+                        markingType="period"
+                        markedDates={markedDates}
+                      />
+                    </CalendarProvider>
+                  </View>
                 </View>
-                <View className="h-20 w-full mt-1">
-                  <CalendarProvider date={todayStr}>
-                    <WeekCalendar
-                      firstDay={1}
-                      allowShadow={false}
-                      hideDayNames={true}
-                      pastScrollRange={0}
-                      futureScrollRange={0}
-                      markingType="period"
-                      markedDates={markedDates}
-                    />
-                  </CalendarProvider>
-                </View>
-              </View>
-            );
-          })}
+              );
+            })
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

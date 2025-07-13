@@ -4,6 +4,7 @@ import {
   View,
   Text,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,8 +15,12 @@ import supabase from "@/lib/supabase";
 import { router } from "expo-router";
 import RNPickerSelect from "react-native-picker-select";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useAppSelector } from '@/store/hooks';
+import { useSupabaseUser } from '@/lib/user';
 
 const Create = () => {
+  useSupabaseUser();
+  const user = useAppSelector((state) => state.auth.user);
   const [isHabit, setIsHabit] = useState(true);
   const [isGroup, setIsGroup] = useState(false);
   const [groupCode, setGroupCode] = useState("");
@@ -34,18 +39,15 @@ const Create = () => {
     name: "",
     description: "",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      console.log(data?.session?.user?.id);
-      setUserUUID(data?.session?.user?.id);
-      if (!data?.session) {
-        router.push("/");
-      }
-    };
-    fetchUser();
-  }, []);
+    if (!user?.id) {
+      router.push("/");
+    } else {
+      setUserUUID(user.id);
+    }
+  }, [user?.id]);
 
   const unselectedClass =
     "px-5 py-2 flex-row items-center m-1 rounded-full border-2";
@@ -97,7 +99,10 @@ const Create = () => {
 
   const handleCreateGroup = async () => {
     if (!groupCode) {
-      alert("Please generate a group code before creating a group.");
+      Alert.alert(
+        "Generate Code",
+        "Please generate a group code before creating a group."
+      );
       return;
     }
     const { data, error } = await supabase
@@ -146,189 +151,201 @@ const Create = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
-        <View className="flex-row items-center justify-between p-5 px-5">
-          <Text className="text-2xl font-pblack text-center uppercase absolute left-0 right-0">
-            Create
-          </Text>
-
-          <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={28} color="black" />
-          </TouchableOpacity>
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg text-black">Loading...</Text>
         </View>
-        <View className="flex-1 bg-white justify-start mt-5">
-          <View className="flex-row justify-center">
-            <TouchableOpacity
-              onPress={() => {
-                setIsHabit(!isHabit);
-                setIsGroup(false);
-              }}
-              className={isHabit ? selectedClass : unselectedClass}
-            >
-              <Feather
-                name="command"
-                size={24}
-                color={isHabit ? "white" : "black"}
-              />
-              <Text
-                className={
-                  isHabit
-                    ? "text-xl text-white ml-3"
-                    : "text-xl ml-3 text-black"
-                }
-              >
-                Habit
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setIsGroup(!isGroup);
-                setIsHabit(false);
-              }}
-              className={isGroup ? selectedClass : unselectedClass}
-            >
-              <Feather
-                name="users"
-                size={24}
-                color={isGroup ? "white" : "black"}
-              />
-              <Text
-                className={
-                  isGroup
-                    ? "text-xl text-white ml-3"
-                    : "text-xl ml-3 text-black"
-                }
-              >
-                Group
-              </Text>
+      ) : (
+        <ScrollView>
+          <View className="flex-row items-center justify-between p-5 px-5">
+            <Text className="text-2xl font-pblack text-center uppercase absolute left-0 right-0">
+              Create
+            </Text>
+
+            <TouchableOpacity onPress={() => router.back()}>
+              <Feather name="arrow-left" size={28} color="black" />
             </TouchableOpacity>
           </View>
-          <View className="flex-row flex-wrap mt-5 p-5">
-            {isHabit ? (
-              <>
-                <TextInput
-                  className="w-full text-lg border-2 border-black p-3 rounded-xl"
-                  placeholder="Habit Name*"
-                  value={habitForm.name}
-                  onChangeText={(value) => handleChange("name", value)}
+          <View className="flex-1 bg-white justify-start mt-5">
+            <View className="flex-row justify-center">
+              <TouchableOpacity
+                onPress={() => {
+                  setIsHabit(!isHabit);
+                  setIsGroup(false);
+                }}
+                className={isHabit ? selectedClass : unselectedClass}
+              >
+                <Feather
+                  name="command"
+                  size={24}
+                  color={isHabit ? "white" : "black"}
                 />
-                <TextInput
-                  className="w-full text-lg border-2 border-black p-3 rounded-xl mt-5"
-                  placeholder="Description"
-                  value={habitForm.description}
-                  onChangeText={(value) => handleChange("description", value)}
+                <Text
+                  className={
+                    isHabit
+                      ? "text-xl text-white ml-3"
+                      : "text-xl ml-3 text-black"
+                  }
+                >
+                  Habit
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setIsGroup(!isGroup);
+                  setIsHabit(false);
+                }}
+                className={isGroup ? selectedClass : unselectedClass}
+              >
+                <Feather
+                  name="users"
+                  size={24}
+                  color={isGroup ? "white" : "black"}
                 />
-                <View className="w-full flex-row justify-between">
+                <Text
+                  className={
+                    isGroup
+                      ? "text-xl text-white ml-3"
+                      : "text-xl ml-3 text-black"
+                  }
+                >
+                  Group
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View className="flex-row flex-wrap mt-5 p-5">
+              {isHabit ? (
+                <>
                   <TextInput
-                    className="w-6/12 text-base border-2 border-black p-3 rounded-xl mt-5"
-                    placeholder="Frequency, eg. 5*"
-                    value={habitForm.frequency_count}
+                    className="w-full text-lg border-2 border-black p-3 rounded-xl"
+                    placeholder="Habit Name*"
+                    value={habitForm.name}
+                    onChangeText={(value) => handleChange("name", value)}
+                  />
+                  <TextInput
+                    className="w-full text-lg border-2 border-black p-3 rounded-xl mt-5"
+                    placeholder="Description"
+                    value={habitForm.description}
+                    onChangeText={(value) => handleChange("description", value)}
+                  />
+                  <View className="w-full flex-row justify-between">
+                    <TextInput
+                      className="w-6/12 text-base border-2 border-black p-3 rounded-xl mt-5"
+                      placeholder="Frequency, eg. 5*"
+                      value={habitForm.frequency_count}
+                      onChangeText={(value) =>
+                        handleChange("frequency_count", value)
+                      }
+                    />
+                    <View className="w-5/12 text-base border-2 border-black px-1 rounded-xl mt-5">
+                      <RNPickerSelect
+                        onValueChange={(value) =>
+                          handleChange("frequency_period", value)
+                        }
+                        items={[
+                          { label: "Weekly", value: "weekly" },
+                          { label: "Monthly", value: "daily" },
+                        ]}
+                      />
+                    </View>
+                  </View>
+                  <View className="w-full flex-row p-5 items-center justify-around">
+                    <View className="w-5/12">
+                      <BouncyCheckbox
+                        text="Reminder?"
+                        fillColor="black"
+                        textStyle={{
+                          color: "black",
+                          fontSize: 16,
+                          fontFamily: "Poppins-Medium",
+                          textDecorationLine: "none",
+                        }}
+                        onPress={(isChecked) =>
+                          handleChange("reminder", isChecked)
+                        }
+                      />
+                    </View>
+                    <View className="w-6/12">
+                      <TouchableOpacity
+                        onPress={showTimepicker}
+                        className="border-2 border-black p-3 rounded-xl w-full"
+                      >
+                        <Text className="text-base">
+                          {habitForm.reminderTime?.toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: true,
+                          })}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <TextInput
+                    className="w-full text-lg border-2 border-black p-3 rounded-xl"
+                    placeholder="Note for reminder"
+                    value={habitForm.reminderNote}
                     onChangeText={(value) =>
-                      handleChange("frequency_count", value)
+                      handleChange("reminderNote", value)
                     }
                   />
-                  <View className="w-5/12 text-base border-2 border-black px-1 rounded-xl mt-5">
-                    <RNPickerSelect
-                      onValueChange={(value) =>
-                        handleChange("frequency_period", value)
-                      }
-                      items={[
-                        { label: "Weekly", value: "weekly" },
-                        { label: "Monthly", value: "daily" },
-                      ]}
+                  <TouchableOpacity
+                    className="mt-5 bg-black p-3 rounded-xl w-full"
+                    onPress={handleCreateHabit}
+                  >
+                    <Text className="text-lg text-white text-center">
+                      Create Habit
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    className="w-full text-lg border-2 border-black p-3 rounded-xl"
+                    placeholder="Group Name"
+                    value={groupForm.name}
+                    onChangeText={(value) =>
+                      setGroupForm({ ...groupForm, name: value })
+                    }
+                  />
+                  <TextInput
+                    className="w-full text-lg border-2 border-black p-3 rounded-xl mt-5"
+                    placeholder="Description"
+                    value={groupForm.description}
+                    onChangeText={(value) =>
+                      setGroupForm({ ...groupForm, description: value })
+                    }
+                  />
+                  <View className="w-full flex-row flex-wrap">
+                    <TextInput
+                      readOnly
+                      className="w-3/5 text-lg border-2 border-black p-3 rounded-xl mt-5 text-black"
+                      placeholder="Group Code"
+                      value={groupCode}
                     />
-                  </View>
-                </View>
-                <View className="w-full flex-row p-5 items-center justify-around">
-                  <View className="w-5/12">
-                    <BouncyCheckbox
-                      text="Reminder?"
-                      fillColor="black"
-                      textStyle={{
-                        color: "black",
-                        fontSize: 16,
-                        fontFamily: "Poppins-Medium",
-                        textDecorationLine: "none",
-                      }}
-                      onPress={(isChecked) =>
-                        handleChange("reminder", isChecked)
-                      }
-                    />
-                  </View>
-                  <View className="w-6/12">
                     <TouchableOpacity
-                      onPress={showTimepicker}
-                      className="border-2 border-black p-3 rounded-xl w-full"
+                      className="mt-5 bg-black rounded-xl w-2/6 justify-center ml-3"
+                      onPress={generateGroupCode}
                     >
-                      <Text className="text-base">
-                        {habitForm.reminderTime?.toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: true,
-                        })}
+                      <Text className="text-base text-white text-center">
+                        Generate
                       </Text>
                     </TouchableOpacity>
                   </View>
-                </View>
-                <TextInput
-                  className="w-full text-lg border-2 border-black p-3 rounded-xl"
-                  placeholder="Note for reminder"
-                  value={habitForm.reminderNote}
-                  onChangeText={(value) => handleChange("reminderNote", value)}
-                />
-                <TouchableOpacity
-                  className="mt-5 bg-black p-3 rounded-xl w-full"
-                  onPress={handleCreateHabit}
-                >
-                  <Text className="text-lg text-white text-center">
-                    Create Habit
-                  </Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  className="w-full text-lg border-2 border-black p-3 rounded-xl"
-                  placeholder="Group Name"
-                  value={groupForm.name}
-                  onChangeText={(value) => setGroupForm({ ...groupForm, name: value })}
-                />
-                <TextInput
-                  className="w-full text-lg border-2 border-black p-3 rounded-xl mt-5"
-                  placeholder="Description"
-                  value={groupForm.description}
-                  onChangeText={(value) => setGroupForm({ ...groupForm, description: value })}
-                />
-                <View className="w-full flex-row flex-wrap">
-                  <TextInput
-                    readOnly
-                    className="w-3/5 text-lg border-2 border-black p-3 rounded-xl mt-5 text-black"
-                    placeholder="Group Code"
-                    value={groupCode}
-                  />
+
                   <TouchableOpacity
-                    className="mt-5 bg-black rounded-xl w-2/6 justify-center ml-3"
-                    onPress={generateGroupCode}
+                    className="mt-5 bg-black p-3 rounded-xl w-full"
+                    onPress={handleCreateGroup}
                   >
-                    <Text className="text-base text-white text-center">
-                      Generate
+                    <Text className="text-lg text-white text-center">
+                      Create Group
                     </Text>
                   </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity
-                  className="mt-5 bg-black p-3 rounded-xl w-full"
-                  onPress={handleCreateGroup}
-                >
-                  <Text className="text-lg text-white text-center">
-                    Create Group
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
