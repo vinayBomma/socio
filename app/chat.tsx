@@ -5,32 +5,28 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  BackHandler,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import supabase from "@/lib/supabase";
+import { useAppSelector } from "@/store/hooks";
+import { useSupabaseUser } from "@/lib/user";
 
 const Chat = () => {
+  useSupabaseUser();
+  const user = useAppSelector((state) => state.auth.user);
   const [messages, setMessages]: any = useState([]);
   const [inputMessage, setInputMessage] = useState("");
-  const [userId, setUserId] = useState<string | undefined>(undefined);
   const data: any = useLocalSearchParams();
   const groupId = data?.id;
   const PLACEHOLDER_AVATAR = "https://cataas.com/cat";
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUserId(data?.session?.user?.id);
-    };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (!groupId) return;
+    if (!groupId || !user?.id) return;
     const fetchMessages = async () => {
       const { data: msgs } = await supabase
         .from("messages")
@@ -44,7 +40,7 @@ const Chat = () => {
           createdAt: msg.created_at,
           user: {
             _id: msg.user_id,
-            name: msg.user_id === userId ? "You" : "User",
+            name: msg.user_id === user.id ? "You" : "User",
           },
         }))
       );
@@ -72,7 +68,7 @@ const Chat = () => {
                 createdAt: msg.created_at,
                 user: {
                   _id: msg.user_id,
-                  name: msg.user_id === userId ? "You" : "User",
+                  name: msg.user_id === user.id ? "You" : "User",
                 },
               },
             ];
@@ -83,17 +79,28 @@ const Chat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [groupId, userId]);
+  }, [groupId, user?.id]);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      router.replace("/groups");
+      return true;
+    };
+    BackHandler.addEventListener("hardwareBackPress", onBackPress);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    };
+  }, []);
 
   const handleInputText = (text: string) => {
     setInputMessage(text);
   };
 
   const handleSubmit = async () => {
-    if (!inputMessage.trim() || !userId || !groupId) return;
+    if (!inputMessage.trim() || !user?.id || !groupId) return;
     await supabase.from("messages").insert({
       group_id: groupId,
-      user_id: userId,
+      user_id: user.id,
       text: inputMessage,
       created_at: new Date().toISOString(),
     });
@@ -151,9 +158,11 @@ const Chat = () => {
                 key={msg._id}
                 style={{
                   alignSelf:
-                    msg.user._id === userId ? "flex-end" : "flex-start",
+                    user && msg.user._id === user.id
+                      ? "flex-end"
+                      : "flex-start",
                   backgroundColor:
-                    msg.user._id === userId ? "#222222" : "#111111",
+                    user && msg.user._id === user.id ? "#222222" : "#111111",
                   borderRadius: 18,
                   paddingVertical: 8,
                   paddingHorizontal: 14,

@@ -41,13 +41,13 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="digest"
+          name="stats"
           options={{
-            title: "Digest",
+            title: "Statistics",
             tabBarIcon: ({ focused }) => {
               return (
                 <Ionicons
-                  name="sparkles-sharp"
+                  name="stats-chart"
                   size={28}
                   color={focused ? "white" : "grey"}
                 />
