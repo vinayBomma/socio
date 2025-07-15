@@ -30,10 +30,10 @@ const Groups = () => {
   const [joinCode, setJoinCode] = useState("");
   const [joining, setJoining] = useState(false);
 
-  useEffect(() => {
+  const fetchGroups = async () => {
     if (!user?.id) return;
     setLoading(true);
-    (async () => {
+    try {
       const { data: memberships, error: memberError } = await supabase
         .from("group_members")
         .select("group_id")
@@ -89,8 +89,21 @@ const Groups = () => {
       });
       setLastMessages(lastMsgMap);
       setLoading(false);
-    })();
-  }, [user?.id]);
+    } catch (err) {
+      console.error("Error in fetchGroups:", err);
+      setGroups([]);
+      setLastMessages({});
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user?.id) {
+        fetchGroups();
+      }
+    }, [user?.id])
+  );
 
   const handleJoinGroup = async (code?: string) => {
     const groupCode = typeof code === "string" ? code : joinCode;
@@ -126,7 +139,8 @@ const Groups = () => {
     setShowJoinDialog(false);
     setJoinCode("");
     setJoining(false);
-    // Optionally, refresh groups list
+    // Refresh groups list
+    fetchGroups();
   };
 
   const renderItem = ({ item, index }: any) => {
@@ -134,7 +148,7 @@ const Groups = () => {
       item?.avatar && item.avatar.trim() !== ""
         ? item.avatar
         : PLACEHOLDER_AVATAR;
-    const lastMsg = lastMessages[item.id]?.text || "";
+    const lastMsg = lastMessages[item.id]?.text || "No messages yet";
     const lastMsgDate = lastMessages[item.id]?.created_at
       ? new Date(lastMessages[item.id].created_at + "Z").toLocaleString([], {
           timeStyle: "short",
@@ -142,28 +156,34 @@ const Groups = () => {
       : "";
     return (
       <TouchableOpacity
-        className="w-full flex-row items-center border-b border-b-gray-200"
+        className="w-full flex-row items-center py-4 px-3 border-b border-b-gray-100"
         key={index}
         onPress={() => router.replace({ pathname: "/chat", params: item })}
       >
-        <View>
+        <View className="mr-3">
           <Image
-            className="w-16 h-16 rounded-full my-3"
+            className="w-14 h-14 rounded-full"
             source={{ uri: avatarUri }}
             resizeMode="cover"
           />
         </View>
-        <View className="flex-row w-full">
-          <View className="flex-col">
-            <Text className="font-semibold text-sm ml-3 mb-2">
+        <View className="flex-1 flex-row justify-between items-center">
+          <View className="flex-1 mr-2">
+            <Text className="font-psemibold text-base text-gray-900 mb-1">
               {item?.name}
             </Text>
-            <Text className="ml-3" numberOfLines={1} ellipsizeMode="tail">
+            <Text
+              className="text-sm text-gray-500 font-pregular"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {lastMsg}
             </Text>
           </View>
-          <View className="absolute right-16">
-            <Text>{lastMsgDate}</Text>
+          <View className="items-end">
+            <Text className="text-xs text-gray-400 font-pregular">
+              {lastMsgDate}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -199,12 +219,13 @@ const Groups = () => {
           </Text>
         </View>
       ) : (
-        <View className="flex-1 px-5 bg-white">
+        <View className="flex-1 bg-white">
           <FlatList
             data={groups}
             showsVerticalScrollIndicator={false}
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 20 }}
           />
         </View>
       )}
